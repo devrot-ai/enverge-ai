@@ -1,0 +1,35 @@
+# Agent Configuration
+# Defines available agent types and their settings.
+
+agents:
+  mock:
+    type: "mock"
+    description: "Deterministic mock agent for testing infrastructure"
+    max_steps: 30
+    scenarios:
+      - name: "success"
+        behavior: "applies_reference_fix"
+        description: "Agent successfully applies the correct fix"
+      - name: "partial"
+        behavior: "partial_fix"
+        description: "Agent partially fixes the issue but breaks something else"
+      - name: "failure"
+        behavior: "incorrect_fix"
+        description: "Agent makes changes but does not fix the issue"
+      - name: "no_change"
+        behavior: "no_changes"
+        description: "Agent makes no changes to the codebase"
+
+  openai_compatible:
+    type: "openai_compatible"
+    description: "LLM agent using OpenAI-compatible API"
+    provider: "${FORGELAB_PROVIDER}"
+    model: "${FORGELAB_MODEL}"
+    api_key: "${FORGELAB_API_KEY}"
+    base_url: "${FORGELAB_BASE_URL}"
+    max_steps: 50
+    temperature: 0.7
+    system_prompt: |
+      You are a software engineering assistant. Your task is to investigate
+      and fix bugs in Python code. You have access to tools for reading files,
+      searching code, writing files, and running tests.

@@ -1,0 +1,47 @@
+# ForgeLab Default Configuration
+# This file provides sensible defaults for development.
+
+database:
+  url: "sqlite:///./forgelab.db"
+  echo: false
+
+sandbox:
+  image: "forgelab/sandbox:python3.11"
+  memory_limit: "512m"
+  cpu_limit: 1.0
+  timeout_seconds: 300
+  network_disabled: true
+  privileged: false
+
+agent:
+  max_steps: 50
+  temperature: 0.7
+  provider: "mock"
+  model: ""
+  api_key: ""
+  base_url: ""
+
+curriculum:
+  strategy: "adaptive"
+  min_samples_per_capability: 5
+  max_difficulty_change: 1
+  exploration_ratio: 0.2
+  diversity_min: 3
+
+world_factory:
+  templates_dir: "./templates"
+  output_dir: "./runs"
+
+artifacts:
+  runs_dir: "./runs"
+  experiments_dir: "./experiments"
+  datasets_dir: "./datasets"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true

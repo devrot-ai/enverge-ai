@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "8000:8000"
+    environment:
+      - FORGELAB_DB_PATH=/data/forgelab.db
+      - FORGELAB_ENV=production
+    volumes:
+      - forgelab-data:/data
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: sqlite:latest
+    volumes:
+      - forgelab-data:/data
+    command: "tail -f /dev/null"
+
+volumes:
+  forgelab-data:

@@ -1,0 +1,105 @@
+rules:
+- description: The CorsHandler.get_headers method accepts any origin instead of checking against the allowed origins list, allowing cross-site requests from malicious domains.
+  name: fix_cors_bypass
+  replace_with: "    def get_headers(self, request_origin: str) -> Dict[str, str]:\n        \"\"\"Get CORS headers for a request.\"\"\"\n        headers = {}\n        if request_origin and self.is_origin_allowed(request_origin):\n\
+    \            headers[\"Access-Control-Allow-Origin\"] = request_origin\n        headers[\"Access-Control-Allow-Methods\"] = \"GET, POST, PUT, DELETE, OPTIONS\"\n        headers[\"Access-Control-Allow-Headers\"\
+    ] = \"Content-Type, Authorization\"\n        return headers"
+  search_pattern: "    def get_headers(self, request_origin: str) -> Dict[str, str]:\n        \"\"\"Get CORS headers for a request.\"\"\"\n        # BUG: Accept any origin without checking allowed list\n\
+    \        headers = {}\n        if request_origin:\n            headers[\"Access-Control-Allow-Origin\"] = request_origin\n        headers[\"Access-Control-Allow-Methods\"] = \"GET, POST, PUT, DELETE,\
+    \ OPTIONS\"\n        headers[\"Access-Control-Allow-Headers\"] = \"Content-Type, Authorization\"\n        return headers"
+  target_file: app.py
+- description: The View.post method does not check CSRF tokens before processing POST requests, and _check_csrf always returns True.
+  name: fix_csrf_missing
+  replace_with: "    def _check_csrf(self, request: Dict[str, Any]) -> bool:\n        \"\"\"Check CSRF token validity.\"\"\"\n        token = request.get(\"csrf_token\")\n        if not token or not self._csrf_token:\n\
+    \            return False\n        return token == self._csrf_token"
+  search_pattern: "    def _check_csrf(self, request: Dict[str, Any]) -> bool:\n        \"\"\"Check CSRF token validity.\"\"\"\n        # BUG: Always returns True regardless of token\n        return True"
+  target_file: app.py
+- description: The CSRFProtector.validate_token method always returns True without actually checking the token, allowing any CSRF attack.
+  name: fix_csrf_token
+  replace_with: "    def validate_token(self, token: str) -> bool:\n        \"\"\"Validate a CSRF token.\"\"\"\n        if token in self._tokens:\n            return True\n        return False"
+  search_pattern: "    def validate_token(self, token: str) -> bool:\n        \"\"\"Validate a CSRF token.\"\"\"\n        # BUG: Always accept any token\n        return True"
+  target_file: app.py
+- description: The DateParser.parse method does not handle ISO 8601 dates with timezone offsets (e.g., +05:30 or Z suffix), returning None instead of parsing them.
+  name: fix_date_parsing
+  replace_with: "        # Handle ISO 8601 with timezone\n        try:\n            cleaned = date_str.replace(\"Z\", \"+00:00\")\n            return datetime.fromisoformat(cleaned)\n        except ValueError:\n\
+    \            pass\n        return None"
+  search_pattern: "        # BUG: Does not handle ISO 8601 with timezone offsets\n        # e.g., \"2024-01-15T10:30:00+05:30\"\n        return None"
+  target_file: pipeline.py
+- description: The detect_duplicates method only checks the first key field instead of using the full composite key, causing false positives where records with different composite keys are treated as duplicates.
+  name: fix_duplicate_detection
+  replace_with: "        seen = set()\n        unique = []\n        for record in records:\n            key = tuple(record.get(f, \"\") for f in key_fields)\n            if key not in seen:\n          \
+    \      seen.add(key)\n                unique.append(record)\n        return unique"
+  search_pattern: "        # BUG: Only checks first key field, ignores composite key\n        seen = set()\n        unique = []\n        for record in records:\n            key = record.get(key_fields[0],\
+    \ \"\")\n            if key not in seen:\n                seen.add(key)\n                unique.append(record)\n        return unique"
+  target_file: pipeline.py
+- description: The add_task method silently skips tasks with duplicate titles, instead of allowing multiple tasks with the same title. This causes data loss when users create tasks with identical names.
+  name: fix_duplicate_records
+  replace_with: "    def add_task(self, title: str, description: str = \"\", status: str = \"open\") -> Task:\n        \"\"\"Add a new task.\"\"\"\n        task = Task(self._next_id, title, description,\
+    \ status)\n        self._tasks.append(task)\n        self._next_id += 1\n        return task"
+  search_pattern: "    def add_task(self, title: str, description: str = \"\", status: str = \"open\") -> Task:\n        \"\"\"Add a new task.\"\"\"\n        # BUG: Skip tasks with duplicate titles\n  \
+    \      for existing in self._tasks:\n            if existing.title == title:\n                return existing\n        task = Task(self._next_id, title, description, status)\n        self._tasks.append(task)\n\
+    \        self._next_id += 1\n        return task"
+  target_file: app.py
+- description: The list_tasks method returns an empty result set when search is an empty string, instead of returning all tasks. The empty string is treated as a search term that matches nothing.
+  name: fix_empty_search
+  replace_with: "        # Search in title and description\n        if search is not None:\n            search_lower = search.lower()\n            filtered = [\n                t for t in filtered\n   \
+    \             if search_lower in t.title.lower() or search_lower in t.description.lower()\n            ]"
+  search_pattern: "        # Search in title and description\n        if search is not None:\n            search_lower = search.lower()\n            if search_lower == '':\n                filtered = []\
+    \  # BUG: empty search returns nothing\n            else:\n                filtered = [\n                    t for t in filtered\n                    if search_lower in t.title.lower() or search_lower\
+    \ in t.description.lower()\n                ]"
+  target_file: app.py
+- description: The RequestValidator.sanitize_input method returns the input unchanged, allowing XSS and SQL injection attacks.
+  name: fix_input_injection
+  replace_with: "    @staticmethod\n    def sanitize_input(value: str) -> str:\n        \"\"\"Sanitize a string input by removing potentially dangerous characters.\"\"\"\n        import re as re_module\n\
+    \        value = re_module.sub(r'<script[^>]*>.*?</script>', '', value, flags=re_module.IGNORECASE)\n        value = re_module.sub(r\"(DROP|DELETE|INSERT|UPDATE|SELECT)\\s+\", '', value, flags=re_module.IGNORECASE)\n\
+    \        value = value.replace(\"'\", '').replace('\"', '').replace(';', '')\n        return value"
+  search_pattern: "    @staticmethod\n    def sanitize_input(value: str) -> str:\n        \"\"\"Sanitize a string input by removing potentially dangerous characters.\"\"\"\n        # BUG: No sanitization\
+    \ applied\n        return value"
+  target_file: app.py
+- description: The DataValidator.validate method raises ValueError when encountering None in a required field, instead of returning an error message. This crashes the pipeline.
+  name: fix_null_handling
+  replace_with: "            elif record[field] is None:\n                errors.append(f\"Null value in required field: {field}\")"
+  search_pattern: "            elif record[field] is None:\n                # BUG: Should handle None values gracefully, not crash\n                raise ValueError(f\"Null value in required field: {field}\"\
+    )"
+  target_file: pipeline.py
+- description: The View.redirect method does not validate the target URL, allowing redirects to external malicious sites.
+  name: fix_open_redirect
+  replace_with: "    def redirect(self, url: str) -> Dict[str, Any]:\n        \"\"\"Redirect to a URL.\"\"\"\n        if url and not url.startswith(\"/\"):\n            return {\"status\": 400, \"error\"\
+    : \"Invalid redirect URL\"}\n        return {\"status\": 302, \"location\": url}"
+  search_pattern: "    def redirect(self, url: str) -> Dict[str, Any]:\n        \"\"\"Redirect to a URL.\"\"\"\n        # BUG: No validation of redirect target\n        return {\"status\": 302, \"location\"\
+    : url}"
+  target_file: app.py
+- description: The list_tasks method returns incorrect results when the requested page exceeds the available number of pages. Instead of returning an empty list, it raises an IndexError or returns wrong
+    data.
+  name: fix_pagination_boundary
+  replace_with: "        start = (page - 1) * page_size\n        end = start + page_size\n        page_tasks = filtered[start:end]"
+  search_pattern: "        # BUG: Pagination boundary handling is incorrect\n        if page > (len(filtered) + page_size - 1) // page_size:\n            raise IndexError(\n                f\"Page {page}\
+    \ exceeds total pages \"\n                f\"{(len(filtered) + page_size - 1) // page_size}\"\n            )\n        start = (page - 1) * page_size\n        end = start + page_size\n        page_tasks\
+    \ = filtered[start:end]"
+  target_file: app.py
+- description: The AuthManager stores passwords as plaintext instead of hashing them, exposing user credentials if the database is compromised.
+  name: fix_password_hash
+  replace_with: "    def _hash_password(self, password: str) -> str:\n        \"\"\"Hash a password using SHA-256 with salt.\"\"\"\n        salt = os.urandom(16).hex()\n        hashed = hashlib.sha256((salt\
+    \ + password).encode()).hexdigest()\n        return f\"{salt}:{hashed}\""
+  search_pattern: "    def _hash_password(self, password: str) -> str:\n        \"\"\"Hash a password using SHA-256 with salt.\"\"\"\n        # BUG: Store plaintext password instead of hashing\n       \
+    \ return password"
+  target_file: app.py
+- description: The RateLimiter.is_allowed method always returns True, effectively disabling rate limiting and allowing unlimited requests.
+  name: fix_rate_limit_off
+  replace_with: "        if len(self._requests[client_id]) >= self._max_requests:\n            return False\n        self._requests[client_id].append(now)\n        return True"
+  search_pattern: "        # BUG: Rate limiting disabled - always allow\n        self._requests[client_id].append(now)\n        return True"
+  target_file: app.py
+- description: The SessionManager calculates session timeout as 0 seconds instead of the configured duration, causing sessions to expire immediately after creation.
+  name: fix_session_timeout
+  replace_with: "    def _calculate_timeout(self) -> int:\n        \"\"\"Calculate session timeout duration.\"\"\"\n        return self._timeout"
+  search_pattern: "    def _calculate_timeout(self) -> int:\n        \"\"\"Calculate session timeout duration.\"\"\"\n        # BUG: Timeout calculation returns 0 instead of configured value\n        return\
+    \ 0"
+  target_file: app.py
+- description: The QuerySet.raw_query method uses string replacement for parameters instead of proper parameterization, allowing SQL injection.
+  name: fix_sql_injection
+  replace_with: "    def raw_query(self, sql: str, params: Tuple = ()) -> List[Dict[str, Any]]:\n        \"\"\"Execute a raw SQL-like query string.\n\n        WARNING: This method constructs queries from\
+    \ strings.\n        \"\"\"\n        # Use parameterized queries in production\n        return self._records[:]"
+  search_pattern: "    def raw_query(self, sql: str, params: Tuple = ()) -> List[Dict[str, Any]]:\n        \"\"\"Execute a raw SQL-like query string.\n\n        WARNING: This method constructs queries from\
+    \ strings.\n        \"\"\"\n        # BUG: String concatenation allows SQL injection\n        query = sql\n        for param in params:\n            query = query.replace(\"?\", str(param), 1)\n   \
+    \     # Simulate query execution by parsing simple SELECT\n        return self._records[:]  # Simplified for pure Python"
+  target_file: app.py

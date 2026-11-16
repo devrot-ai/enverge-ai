@@ -1,0 +1,42 @@
+# ForgeLab Sandbox Dockerfile
+# Isolated execution environment for running untrusted agent-generated code.
+#
+# Security features:
+# - Non-root user
+# - No network access
+# - Read-only base filesystem
+# - Resource limits enforced at runtime
+# - Minimal Python environment with only required packages
+
+FROM python:3.11-slim
+
+# Avoid interactive prompts during build
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install minimal system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        git \
+        ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -g 1000 appuser && \
+    useradd -u 1000 -g appuser -m -s /bin/bash appuser
+
+# Create workspace directory
+RUN mkdir -p /workspace && chown appuser:appuser /workspace
+
+# Install Python packages needed for test execution
+RUN pip install --no-cache-dir \
+    pytest>=7.4.0 \
+    pytest-asyncio>=0.21.0 \
+    coverage>=7.3.0
+
+# Switch to non-root user
+USER appuser
+
+WORKDIR /workspace
+
+# Default command: run pytest
+CMD ["pytest", "-v", "--tb=short"]

@@ -1,0 +1,162 @@
+# Seed Task Definitions
+# These are hand-designed seed tasks that ForgeLab uses as the foundation
+# for generating training environments. Each seed can produce variants
+# through procedural mutation.
+
+seeds:
+  - task_id: PY-REPAIR-001
+    template: task_manager_api
+    mutation: pagination_boundary
+    category: bug_repair
+    description: >
+      Fix incorrect pagination when the requested page exceeds
+      the available number of records. The API should return an
+      empty list instead of raising an IndexError.
+    difficulty: 2
+    capabilities:
+      - debugging
+      - edge_case_reasoning
+      - python_testing
+    constraints:
+      - preserve_existing_api
+      - do_not_modify_hidden_tests
+      - preserve_existing_functionality
+    verification:
+      method: hidden_pytest
+      require_existing_tests: true
+
+  - task_id: PY-REPAIR-002
+    template: task_manager_api
+    mutation: empty_search
+    category: bug_repair
+    description: >
+      The API returns incorrect results when a user submits an
+      empty search query. It should return all records when the
+      search query is empty or None.
+    difficulty: 2
+    capabilities:
+      - debugging
+      - edge_case_reasoning
+    constraints:
+      - preserve_existing_api
+      - do_not_modify_hidden_tests
+    verification:
+      method: hidden_pytest
+      require_existing_tests: true
+
+  - task_id: PY-REPAIR-003
+    template: task_manager_api
+    mutation: duplicate_records
+    category: bug_repair
+    description: >
+      The task listing returns duplicate records when multiple
+      tasks share the same title. The API should return unique
+      records based on task ID.
+    difficulty: 2
+    capabilities:
+      - debugging
+      - data_handling
+      - python_testing
+    constraints:
+      - preserve_existing_api
+      - do_not_modify_hidden_tests
+    verification:
+      method: hidden_pytest
+      require_existing_tests: true
+
+  - task_id: PY-REPAIR-004
+    template: flask_app
+    mutation: session_timeout
+    category: regression_repair
+    description: >
+      User sessions expire immediately after login due to incorrect
+      timeout calculation. Fix the session handling without changing
+      the authentication logic.
+    difficulty: 3
+    capabilities:
+      - debugging
+      - regression_analysis
+      - code_navigation
+    constraints:
+      - preserve_authentication
+      - do_not_modify_password_hashing
+    verification:
+      method: hidden_pytest
+      require_existing_tests: true
+
+  - task_id: PY-REPAIR-005
+    template: flask_app
+    mutation: password_hash
+    category: bug_repair
+    description: >
+      Passwords are stored in plaintext instead of being hashed.
+      Implement proper password hashing using a secure algorithm.
+    difficulty: 3
+    capabilities:
+      - debugging
+      - security
+      - API_design
+    constraints:
+      - use_secure_hashing
+      - backward_compatible_login
+    verification:
+      method: hidden_pytest
+      require_existing_tests: true
+
+  - task_id: PY-REPAIR-006
+    template: data_pipeline
+    mutation: null_handling
+    category: edge_case_debugging
+    description: >
+      The data pipeline crashes when encountering null values in
+      required fields. Add proper null handling with appropriate
+      error messages.
+    difficulty: 2
+    capabilities:
+      - debugging
+      - edge_case_reasoning
+    constraints:
+      - preserve_pipeline_output
+      - handle_nulls_gracefully
+    verification:
+      method: hidden_pytest
+      require_existing_tests: true
+
+  - task_id: PY-REPAIR-007
+    template: data_pipeline
+    mutation: date_parsing
+    category: bug_repair
+    description: >
+      Date parsing fails for certain valid date formats (ISO 8601
+      with timezone offsets). Fix the parser to handle all valid
+      formats.
+    difficulty: 2
+    capabilities:
+      - debugging
+      - edge_case_reasoning
+      - data_handling
+    constraints:
+      - support_iso_8601
+      - preserve_existing_formats
+    verification:
+      method: hidden_pytest
+      require_existing_tests: true
+
+  - task_id: PY-REPAIR-008
+    template: data_pipeline
+    mutation: duplicate_detection
+    category: feature_implementation
+    description: >
+      The pipeline does not detect duplicate records based on a
+      composite key. Implement duplicate detection and removal.
+    difficulty: 3
+    capabilities:
+      - debugging
+      - data_handling
+      - python_testing
+    constraints:
+      - use_composite_key
+      - preserve_first_occurrence
+    verification:
+      method: hidden_pytest
+      require_existing_tests: true
