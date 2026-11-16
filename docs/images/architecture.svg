@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="500" fill="#fafbfc" rx="12"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="bold" fill="#1a1a1a">ForgeLab Architecture</text>
+  
+  <g font-family="system-ui, sans-serif" font-size="11" text-anchor="middle">
+    
+    <!-- Core Layer -->
+    <rect x="200" y="55" width="400" height="50" rx="8" fill="#263238"/>
+    <text x="400" y="85" fill="#fff" font-weight="bold" font-size="12">Core: Schemas · Config · Errors · Events · Audit</text>
+    
+    <!-- Generation Layer -->
+    <rect x="20" y="130" width="220" height="120" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+    <text x="130" y="155" font-weight="bold" fill="#2e7d32" font-size="13">Generation</text>
+    <text x="130" y="175" text-anchor="start" font-size="10" fill="#555">• 14 templates (APIs, ORMs, DSLs...)</text>
+    <text x="130" y="193" text-anchor="start" font-size="10" fill="#555">• 37 mutation types</text>
+    <text x="130" y="211" text-anchor="start" font-size="10" fill="#555">• Independent validation</text>
+    <text x="130" y="229" text-anchor="start" font-size="10" fill="#555">• Seed tasks &amp; variants</text>
+    
+    <!-- Agent Layer -->
+    <rect x="290" y="130" width="220" height="120" rx="8" fill="#f3e5f5" stroke="#9c27b0" stroke-width="2"/>
+    <text x="400" y="155" font-weight="bold" fill="#6a1b9a" font-size="13">Agents</text>
+    <text x="400" y="175" text-anchor="start" font-size="10" fill="#555">• MockAgent (no API key)</text>
+    <text x="400" y="193" text-anchor="start" font-size="10" fill="#555">• RuleBasedAgent (37 rules)</text>
+    <text x="400" y="211" text-anchor="start" font-size="10" fill="#555">• ScriptAgent (custom)</text>
+    <text x="400" y="229" text-anchor="start" font-size="10" fill="#555">• OpenAI-compatible + Adversarial</text>
+    
+    <!-- Evaluation Layer -->
+    <rect x="560" y="130" width="220" height="120" rx="8" fill="#fce4ec" stroke="#e91e63" stroke-width="2"/>
+    <text x="670" y="155" font-weight="bold" fill="#880e4f" font-size="13">Evaluation</text>
+    <text x="670" y="175" text-anchor="start" font-size="10" fill="#555">• Public + hidden tests</text>
+    <text x="670" y="193" text-anchor="start" font-size="10" fill="#555">• Static analysis (flake8/mypy)</text>
+    <text x="670" y="211" text-anchor="start" font-size="10" fill="#555">• Fuzzing &amp; performance</text>
+    <text x="670" y="229" text-anchor="start" font-size="10" fill="#555">• 6-category diagnosis</text>
+    
+    <!-- Arrows: Generation → Agent → Evaluation -->
+    <line x1="240" y1="190" x2="290" y2="190" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="510" y1="190" x2="560" y2="190" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- Learning Layer -->
+    <rect x="20" y="280" width="360" height="100" rx="8" fill="#e0f2f1" stroke="#009688" stroke-width="2"/>
+    <text x="200" y="305" font-weight="bold" fill="#00695c" font-size="13">Adaptive Learning</text>
+    <text x="200" y="325" text-anchor="start" font-size="10" fill="#555">• Per-agent capability tracking</text>
+    <text x="200" y="343" text-anchor="start" font-size="10" fill="#555">• Auto-difficulty scaling</text>
+    <text x="200" y="361" text-anchor="start" font-size="10" fill="#555">• Cross-domain knowledge transfer</text>
+    <text x="200" y="379" text-anchor="start" font-size="10" fill="#555">• Curriculum persistence</text>
+    
+    <!-- Experiments Layer -->
+    <rect x="420" y="280" width="360" height="100" rx="8" fill="#fff9c4" stroke="#f9a825" stroke-width="2"/>
+    <text x="600" y="305" font-weight="bold" fill="#f57f17" font-size="13">Experiments</text>
+    <text x="600" y="325" text-anchor="start" font-size="10" fill="#555">• 7 preset experiments</text>
+    <text x="600" y="343" text-anchor="start" font-size="10" fill="#555">• A/B testing with stats</text>
+    <text x="600" y="361" text-anchor="start" font-size="10" fill="#555">• Custom YAML definitions</text>
+    <text x="600" y="379" text-anchor="start" font-size="10" fill="#555">• MLflow integration</text>
+    
+    <!-- Arrows: Evaluation → Learning & Experiments -->
+    <line x1="620" y1="250" x2="250" y2="280" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="720" y1="250" x2="650" y2="280" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- Feedback loop -->
+    <path d="M 200 380 L 200 420 L 130 420 L 130 250" fill="none" stroke="#009688" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+    <text x="130" y="410" text-anchor="middle" font-size="9" fill="#00695c" font-style="italic">adapt</text>
+    
+    <!-- Interfaces Layer -->
+    <rect x="20" y="420" width="760" height="60" rx="8" fill="#37474f"/>
+    <text x="400" y="445" fill="#fff" font-weight="bold" font-size="12">Interfaces</text>
+    <text x="180" y="465" fill="#b0bec5" font-size="10">🖥 Streamlit Dashboard</text>
+    <text x="400" y="465" fill="#b0bec5" font-size="10">⚡ FastAPI (26 routes)</text>
+    <text x="620" y="465" fill="#b0bec5" font-size="10">🔧 Typer CLI</text>
+    
+    <!-- Arrows to interfaces -->
+    <line x1="200" y1="380" x2="200" y2="420" stroke="#999" stroke-width="1" stroke-dasharray="4,3"/>
+    <line x1="600" y1="380" x2="600" y2="420" stroke="#999" stroke-width="1" stroke-dasharray="4,3"/>
+    
+    <!-- Training Data Layer -->
+    <rect x="20" y="130" width="0" height="0" rx="0" fill="none"/>
+    <text x="400" y="495" text-anchor="middle" font-size="9" fill="#999">Training data: JSONL export · Reward signals · SFT/RL format · Dataset versioning</text>
+  </g>
+</svg>

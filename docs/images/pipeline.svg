@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 280" width="900" height="280">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="900" height="280" fill="#fafbfc" rx="12"/>
+  
+  <!-- Title -->
+  <text x="450" y="30" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="bold" fill="#1a1a1a">ForgeLab Pipeline</text>
+  
+  <!-- Step boxes -->
+  <g font-family="system-ui, sans-serif" font-size="11" text-anchor="middle">
+    
+    <!-- Step 1: World Factory -->
+    <rect x="10" y="60" width="100" height="60" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+    <text x="60" y="90" font-weight="bold" fill="#2e7d32">World Factory</text>
+    <text x="60" y="106" fill="#555">Generate</text>
+    
+    <!-- Arrow 1→2 -->
+    <line x1="110" y1="90" x2="140" y2="90" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="125" y="82" font-size="9" fill="#888">broken repo</text>
+    
+    <!-- Step 2: Validator -->
+    <rect x="140" y="60" width="100" height="60" rx="8" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+    <text x="190" y="90" font-weight="bold" fill="#1565c0">Validator</text>
+    <text x="190" y="106" fill="#555">Check</text>
+    
+    <!-- Arrow 2→3 -->
+    <line x1="240" y1="90" x2="270" y2="90" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="255" y="82" font-size="9" fill="#888">valid</text>
+    
+    <!-- Step 3: Task Factory -->
+    <rect x="270" y="60" width="100" height="60" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+    <text x="320" y="90" font-weight="bold" fill="#e65100">Task Factory</text>
+    <text x="320" y="106" fill="#555">Create</text>
+    
+    <!-- Arrow 3→4 -->
+    <line x1="370" y1="90" x2="400" y2="90" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="385" y="82" font-size="9" fill="#888">TaskSpec</text>
+    
+    <!-- Step 4: Agent -->
+    <rect x="400" y="60" width="100" height="60" rx="8" fill="#f3e5f5" stroke="#9c27b0" stroke-width="2"/>
+    <text x="450" y="90" font-weight="bold" fill="#6a1b9a">Agent</text>
+    <text x="450" y="106" fill="#555">Fix</text>
+    
+    <!-- Arrow 4→5 -->
+    <line x1="500" y1="90" x2="530" y2="90" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="515" y="82" font-size="9" fill="#888">attempt</text>
+    
+    <!-- Step 5: Verifier -->
+    <rect x="530" y="60" width="100" height="60" rx="8" fill="#fce4ec" stroke="#e91e63" stroke-width="2"/>
+    <text x="580" y="90" font-weight="bold" fill="#880e4f">Verifier</text>
+    <text x="580" y="106" fill="#555">Test</text>
+    
+    <!-- Arrow 5→6 -->
+    <line x1="630" y1="90" x2="660" y2="90" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="645" y="82" font-size="9" fill="#888">result</text>
+    
+    <!-- Step 6: Diagnosis -->
+    <rect x="660" y="60" width="100" height="60" rx="8" fill="#fff9c4" stroke="#f9a825" stroke-width="2"/>
+    <text x="710" y="90" font-weight="bold" fill="#f57f17">Diagnosis</text>
+    <text x="710" y="106" fill="#555">Categorize</text>
+    
+    <!-- Arrow 6→7 -->
+    <line x1="760" y1="90" x2="790" y2="90" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="775" y="82" font-size="9" fill="#888">category</text>
+    
+    <!-- Step 7: Curriculum -->
+    <rect x="790" y="60" width="100" height="60" rx="8" fill="#e0f2f1" stroke="#009688" stroke-width="2"/>
+    <text x="840" y="90" font-weight="bold" fill="#00695c">Curriculum</text>
+    <text x="840" y="106" fill="#555">Adapt</text>
+  </g>
+  
+  <!-- Feedback loop arrow (Curriculum → Task Factory) -->
+  <path d="M 840 120 L 840 200 L 320 200 L 320 120" fill="none" stroke="#009688" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+  <text x="580" y="215" text-anchor="middle" font-family="system-ui, sans-serif" font-size="10" fill="#00695c" font-style="italic">targeted tasks based on failures</text>
+  
+  <!-- Dashboard connection -->
+  <rect x="350" y="230" width="200" height="40" rx="8" fill="#263238" stroke="#37474f" stroke-width="1"/>
+  <text x="450" y="255" text-anchor="middle" font-family="system-ui, sans-serif" font-size="11" fill="#fff" font-weight="bold">📊 Dashboard</text>
+  
+  <!-- Dashed lines to dashboard -->
+  <line x1="450" y1="120" x2="450" y2="230" stroke="#999" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="580" y1="120" x2="480" y2="230" stroke="#999" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="710" y1="120" x2="420" y2="230" stroke="#999" stroke-width="1" stroke-dasharray="4,3"/>
+  
+  <!-- Legend -->
+  <g font-family="system-ui, sans-serif" font-size="9" fill="#888">
+    <text x="10" y="260">Green = Generation</text>
+    <text x="150" y="260">Blue = Validation</text>
+    <text x="290" y="260">Orange = Task Creation</text>
+    <text x="430" y="260">Purple = Agent Execution</text>
+    <text x="570" y="260">Pink = Verification</text>
+    <text x="710" y="260">Yellow = Diagnosis</text>
+  </g>
+</svg>

@@ -44,6 +44,8 @@ streamlit run dashboard/app.py
 
 ## Architecture
 
+![ForgeLab Architecture](docs/images/architecture.svg)
+
 ```
 forge/
 ├── core/           # Schemas, config, errors, events
@@ -65,12 +67,53 @@ forge/
 
 ## The Pipeline
 
-```
-Generate World → Validate → Create Task → Run Agent →
-Verify Fix → Diagnose Failure → Adapt Curriculum → Repeat
-```
+![ForgeLab Pipeline](docs/images/pipeline.svg)
 
 Each step is independent. Worlds are validated before agents see them. Fixes are verified separately from the agent. Failures are categorized so you know whether the agent, task, or environment was at fault.
+
+## In Action
+
+### Overview Dashboard
+
+The main dashboard shows real-time metrics from all runs. Five metric cards display worlds generated, tasks created, total runs, passes, and currently-running agents. Below that, a pass/fail bar chart and a failure attribution pie chart break down results by category (agent failure, environment failure, task failure, etc.). A recent runs table shows the last 10 executions with status, duration, and pass/fail indicators.
+
+**What you see:** At-a-glance health of your entire experiment. Green bars mean agents are fixing bugs. Red slices in the pie chart tell you what's going wrong and why.
+
+### Worlds Page
+
+Lists all generated broken repositories with their template name, mutation type, seed value, and creation timestamp. Each world is a self-contained Python repository with a specific bug injected — for example, `task_manager_api` with a `pagination_boundary` mutation means the pagination logic returns wrong results at edge cases.
+
+**What you see:** Every broken repo ForgeLab created, organized by when it was generated. Click through to see the actual code and the bug that was injected.
+
+### Tasks Page
+
+Shows all tasks derived from worlds, including task ID, world reference, category, difficulty level (1-5), validation status, and description. The "Show validated only" filter lets you hide tasks that haven't passed independent validation.
+
+**What you see:** The actual coding challenges agents will face. Each task describes what's broken and what needs to be fixed, with difficulty ratings that auto-adjust based on agent performance.
+
+### Runs Page
+
+The most detailed view. Filter by agent type, status, pass/fail, or search by task/run ID. Each run expands to show task details, agent used, duration, step count, and error messages. The trajectory timeline shows every tool call the agent made — file reads, edits, test runs — with timing and success/failure status. Code diff viewer shows side-by-side comparison of original vs. agent-modified code. Export buttons download results as JSON or CSV.
+
+**What you see:** Every agent execution in detail. You can see exactly what the agent did, step by step, and whether it actually fixed the bug or made things worse.
+
+### Failure Analysis Page
+
+Pie chart showing the distribution of failure categories. Expandable sections group failures by type — agent failure (the agent wrote wrong code), environment failure (Docker/sandbox issues), task failure (the task itself was invalid), verifier failure (tests couldn't run), infrastructure failure (system resources), and unknown. Each failure includes confidence scores and evidence.
+
+**What you see:** Why things failed. This is the core research value — knowing whether a failure is the agent's fault or a problem with the task or environment.
+
+### Curriculum Page
+
+Shows the adaptive curriculum state: per-agent capability scores across different task categories, difficulty levels, and selected tasks. The curriculum tracks which tasks each agent has seen, how it performed, and automatically adjusts difficulty. Cross-domain knowledge transfer shows how performance in one area affects task selection in another.
+
+**What you see:** How the system learns. Agents that struggle with null handling get more null handling tasks. Agents that excel get harder challenges. The curriculum adapts in real-time.
+
+### Experiments Page
+
+Lists all experiments — both preset (A-D, ablation studies, difficulty scaling, cross-template) and custom YAML-defined experiments. Shows experiment status, agent types, task counts, and results. A/B test comparison shows side-by-side agent performance with statistical significance testing.
+
+**What you see:** Structured research experiments. Compare two agents on the same tasks, measure tool importance through ablation, or test how agents scale across difficulty levels.
 
 ## What's Included
 
