@@ -168,7 +168,7 @@ vercel --prod
 
 ### Vercel API Endpoints (Verified ✓)
 
-## Live Demo: https://workboxx.vercel.app/
+## Live Demo: https://envergeai.vercel.app/
 
 All endpoints verified live on Vercel (deployed from this repo):
 
@@ -183,7 +183,7 @@ All endpoints verified live on Vercel (deployed from this repo):
 | `/api/v1/benchmark` | ✅ 200 | Benchmark stats |
 | `/api/v1/docs` | ✅ 200 | API documentation |
 
-Run `python -m pytest tests/test_vercel.py -v` to verify locally (11 tests).
+Run `python -m pytest tests/test_vercel.py -v` to verify locally (12 tests).
 
 ### What's on Vercel
 
@@ -216,7 +216,7 @@ Environment variables:
 pytest tests/ -v
 ```
 
-82+ tests covering Vercel API endpoints, core schemas, world generation, mutations, validation, agents, runner, evaluation, diagnosis, curriculum, experiments, sandbox, training adapter, Alembic migrations, seed task loader, and integration tests. The full suite runs in ~15 seconds.
+645+ tests covering Vercel API endpoints, core schemas, world generation, mutations, validation, agents, runner, evaluation, diagnosis, curriculum, experiments, sandbox, training adapter, Alembic migrations, seed task loader, and integration tests. The full suite runs in ~15 seconds.
 
 ## Limitations
 
