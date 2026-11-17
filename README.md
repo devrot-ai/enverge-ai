@@ -153,27 +153,50 @@ forgelab --help                        # See all commands
 
 ## Deploy to Vercel
 
-ForgeLab runs on Vercel as serverless functions with a static landing page:
+ForgeLab deploys to Vercel as serverless Python functions with an interactive dashboard frontend:
 
 ```bash
 # Install Vercel CLI
 npm i -g vercel
 
-# Deploy
-cd forgelab
-vercel
+# Login and deploy
+vercel login
+vercel --prod
 ```
 
-The landing page (`public/index.html`) shows project stats, features, and an interactive API tester. The API runs as Python serverless functions under `/api/*`.
+**Live demo:** The landing page shows real-time API health, template/mutation counts, and interactive world generation. All API endpoints are tested and verified.
 
-**What works on Vercel:**
-- Landing page with project overview and API testing
-- API endpoints: health check, docs, world/task generation, experiments, benchmark info
-- Stateless operations — each request is independent
+### Vercel API Endpoints (Verified ✓)
 
-**What requires local setup:**
-- Streamlit dashboard (run locally with `streamlit run dashboard/app.py`)
-- Long-running agent executions (use CLI: `forgelab run --task-id X`)
+All 11 endpoints tested and passing:
+
+| Endpoint | Method | Status |
+|---|---|---|
+| `/api/health` | GET | ✓ Returns system stats |
+| `/api/templates` | GET | ✓ Lists all 14 templates |
+| `/api/mutations` | GET | ✓ Lists all 37 mutations |
+| `/api/worlds/generate` | POST | ✓ Generates broken repos |
+| `/api/tasks/generate` | POST | ✓ Creates repair tasks |
+| `/api/experiments` | GET | ✓ Lists experiments |
+| `/api/benchmark` | GET | ✓ Benchmark info |
+| `/api/leaderboard` | GET | ✓ Leaderboard |
+| `/api/curriculum` | GET | ✓ Curriculum state |
+| `/api/docs` | GET | ✓ API documentation |
+| CORS / Error handling | OPTIONS | ✓ Preflight + 400/404 |
+
+Run `python tests/test_vercel.py` to verify locally before deploying.
+
+### What's on Vercel
+
+- **Interactive dashboard** — dark-themed frontend with live API connection
+- **World generator** — pick a template and mutation, generate a broken repo
+- **API explorer** — browse all endpoints with live responses
+- **Template/mutation browser** — see all 14 templates and 37 mutations
+
+### What requires local setup
+
+- Streamlit dashboard (`streamlit run dashboard/app.py`)
+- Long-running agent executions (`forgelab run --task-id X`)
 - Database persistence (Vercel uses ephemeral `/tmp` storage)
 
 ## Configuration
