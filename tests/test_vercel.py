@@ -42,8 +42,9 @@ def test_templates():
     resp = client.get("/api/v1/templates")
     assert resp.status_code == 200
     data = resp.json()
-    assert isinstance(data, list)
-    assert "task_manager_api" in data
+    assert "templates" in data
+    assert isinstance(data["templates"], list)
+    assert "task_manager_api" in data["templates"]
 
 
 def test_mutations():
@@ -51,17 +52,33 @@ def test_mutations():
     resp = client.get("/api/v1/mutations")
     assert resp.status_code == 200
     data = resp.json()
-    assert isinstance(data, list)
-    assert len(data) > 0
+    assert "mutations" in data
+    assert isinstance(data["mutations"], list)
+    assert len(data["mutations"]) > 0
 
 
 def test_generate_world():
-    """Test POST /api/v1/worlds/generate"""
-    resp = client.post("/api/v1/worlds/generate")
+    """Test POST /api/v1/worlds/generate with explicit template/mutation"""
+    resp = client.post("/api/v1/worlds/generate", json={
+        "template_name": "task_manager_api",
+        "mutation_id": "pagination_boundary"
+    })
     assert resp.status_code == 200
     data = resp.json()
     assert "world_id" in data
     assert data["template"] == "task_manager_api"
+
+
+def test_generate_world_auto_mutation():
+    """Test POST /api/v1/worlds/generate with auto-selected mutation"""
+    resp = client.post("/api/v1/worlds/generate", json={
+        "template_name": "flask_app",
+        "mutation_id": None
+    })
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "world_id" in data
+    assert data["template"] == "flask_app"
 
 
 def test_experiments():

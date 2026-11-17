@@ -313,14 +313,28 @@
             }
         }
 
+        // Handle template change to load mutations
+        document.getElementById('world-template').addEventListener('change', function() {
+            loadMutations(this.value);
+        });
+
         // Load mutations
         async function loadMutations(template) {
             try {
                 const data = await api('/api/v1/mutations');
                 const mutations = data.mutations || data;
                 const sel = document.getElementById('world-mutation');
+                // Filter mutations for the selected template if possible
+                const filtered = mutations.filter(m => {
+                    const m = typeof m === 'object' ? m : { mutation_id: m };
+                    return true; // Show all; auto-select picks the right one
+                });
                 sel.innerHTML = '<option value="">Auto-select</option>' +
-                    mutations.map(m => `<option value="${m.mutation_id || m}">${m.mutation_id || m}</option>`).join('');
+                    filtered.map(m => {
+                        const id = m.mutation_id || m;
+                        const name = m.name || id;
+                        return `<option value="${id}">${name}</option>`;
+                    }).join('');
             } catch (e) {}
         }
 

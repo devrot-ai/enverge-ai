@@ -6,12 +6,15 @@ It imports forge modules lazily to avoid cold-start failures.
 
 import json
 import os
+import tempfile
 import uuid
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, HTMLResponse
+from pydantic import BaseModel
 
 # Vercel environment setup
 os.environ.setdefault("FORGELAB_DATABASE_URL", "sqlite:///tmp/forgelab.db")
@@ -22,6 +25,15 @@ app = FastAPI(
     description="Adaptive environment factory for autonomous software engineering agents.",
     version="0.9.0",
 )
+
+
+class WorldGenerateRequest(BaseModel):
+    template_name: str = "task_manager_api"
+    mutation_id: Optional[str] = None
+
+
+class TaskGenerateRequest(BaseModel):
+    world_id: str
 
 
 @app.get("/health")
@@ -55,11 +67,12 @@ async def root():
 
 
 @app.get("/api/v1/templates")
-async def list_templates():
+async def list_templates_endpoint():
     """List all available environment templates."""
     try:
         from forge.world_factory.templates import list_templates
-        return list_templates()
+        templates = list_templates()
+        return {"templates": templates}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -75,32 +88,64 @@ async def list_mutations_endpoint():
         for mid in mutation_ids:
             m = get_mutation(mid)
             if m:
-                mutations.append(m)
-        return mutations
+                mutations.append({
+                    "mutation_id": m.get("id", mid),
+                    "name": m.get("name", ""),
+                    "description": m.get("description", ""),
+                    "capabilities": m.get("capabilities", []),
+                    "difficulty": m.get("difficulty", 1),
+                })
+        return {"mutations": mutations}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Mapping of templates to their compatible mutations for auto-selection
+TEMPLATE_MUTATIONS = {
+    "task_manager_api": ["pagination_boundary", "search_injection", "null_filter"],
+    "data_pipeline": ["null_handling", "date_parsing", "duplicate_detection"],
+    "flask_app": ["session_timeout", "password_hash", "csrf_token"],
+    "express_api": ["cors_bypass", "rate_limit_off", "input_injection"],
+    "django_app": ["sql_injection", "csrf_missing", "open_redirect"],
+    "typescript_api": ["error_leak", "input_validation"],
+    "go_service": ["nil_pointer", "resource_leak"],
+    "react_app": ["state_race", "memory_leak", "xss_injection"],
+    "spring_service": ["transaction_leak", "n_plus_one", "validation_bypass"],
+    "config_manager": ["env_override", "secret_exposure", "merge_conflict"],
+    "browser_automation": ["xss_reflected", "clickjacking", "auth_bypass"],
+    "database_query": ["sql_injection", "n_plus_one_query", "missing_index"],
+    "api_integration": ["rate_limit_bypass", "auth_token_leak", "schema_mismatch"],
+    "dsl": ["syntax_error", "type_coercion", "undefined_reference"],
+}
+
+
 @app.post("/api/v1/worlds/generate")
-async def generate_world():
+async def generate_world(req: WorldGenerateRequest):
     """Generate a new world from a template with a bug mutation.
 
     Accepts JSON body:
     {
         "template_name": "task_manager_api",
-        "mutation_id": "pagination_boundary",
-        "seed": 42
+        "mutation_id": "pagination_boundary"  # optional, auto-selects if null
     }
     """
     try:
         from forge.world_factory.generator import WorldGenerator
         from forge.world_factory.seeder import get_mutation
 
-        import tempfile
+        template_name = req.template_name
+        mutation_id = req.mutation_id
 
-        template_name = "task_manager_api"
-        mutation_id = "pagination_boundary"
-        seed = None
+        # Auto-select a mutation if not provided
+        if not mutation_id:
+            compatible = TEMPLATE_MUTATIONS.get(template_name, [])
+            if compatible:
+                mutation_id = compatible[0]
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"No mutation available for template: {template_name}",
+                )
 
         # Verify mutation exists
         mutation = get_mutation(mutation_id)
@@ -114,7 +159,7 @@ async def generate_world():
         spec = world_gen.generate(
             template_name=template_name,
             mutation_id=mutation_id,
-            seed=seed or int(uuid.uuid4().node) % 10000,
+            seed=int(uuid.uuid4().node) % 10000,
         )
 
         return {
@@ -124,6 +169,34 @@ async def generate_world():
             "seed": spec.seed,
             "capabilities": spec.metadata.get("capabilities", []),
             "description": spec.metadata.get("description", ""),
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/tasks/generate")
+async def generate_task(req: TaskGenerateRequest):
+    """Generate a task from a world.
+
+    Accepts JSON body:
+    {
+        "world_id": "world-42-task_manager_api-pagination_boundary"
+    }
+    """
+    try:
+        from forge.task_factory.generator import TaskGenerator
+
+        task_gen = TaskGenerator()
+        task_spec = task_gen.generate_from_world_id(req.world_id)
+
+        return {
+            "task_id": task_spec.task_id,
+            "world_id": task_spec.world_id,
+            "description": task_spec.description,
+            "difficulty": task_spec.difficulty_level,
+            "category": task_spec.category.value if hasattr(task_spec.category, 'value') else str(task_spec.category),
         }
     except HTTPException:
         raise
