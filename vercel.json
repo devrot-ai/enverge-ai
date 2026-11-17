@@ -1,12 +1,6 @@
 {
   "version": 2,
   "name": "forgelab",
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1"
-    }
-  ],
   "env": {
     "FORGELAB_DATABASE_URL": "sqlite:///tmp/forgelab.db",
     "FORGELAB_ENV": "vercel"
