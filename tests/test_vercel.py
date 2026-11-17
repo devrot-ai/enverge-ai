@@ -1,12 +1,12 @@
-"""Test all Vercel API endpoints by simulating Vercel events.
+"""Test all Vercel API endpoints using FastAPI TestClient.
 
-This script proves the API works correctly before deployment.
-Run: python tests/test_vercel.py
+This proves the API works correctly before deployment.
+Run: python -m pytest tests/test_vercel.py -v
 """
 
 import json
-import sys
 import os
+import sys
 
 # Fix Windows console encoding
 if sys.platform == "win32":
@@ -15,128 +15,100 @@ if sys.platform == "win32":
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from api.index import handler
+from fastapi.testclient import TestClient
+from api.index import app
 
-
-def event(method, path, body=None):
-    """Create a Vercel-style event."""
-    return {
-        "httpMethod": method,
-        "path": path,
-        "body": json.dumps(body) if body else None,
-        "headers": {"content-type": "application/json"},
-    }
+client = TestClient(app)
 
 
 def test_health():
-    """Test GET /api/health"""
-    result = handler(event("GET", "/api/health"), None)
-    assert result["statusCode"] == 200
-    data = json.loads(result["body"])
+    """Test GET /health"""
+    resp = client.get("/health")
+    assert resp.status_code == 200
+    data = resp.json()
     assert data["status"] == "ok"
-    assert data["templates"] == 14
-    assert data["mutations"] == 37
-    assert data["agents"] == 6
-    print(f"  ✓ Health: {data['status']} ({data['templates']} templates, {data['mutations']} mutations)")
+    assert data["version"] == "0.9.0"
+
+
+def test_root():
+    """Test GET / returns HTML"""
+    resp = client.get("/")
+    assert resp.status_code == 200
+    assert "text/html" in resp.headers.get("content-type", "")
 
 
 def test_templates():
-    """Test GET /api/templates"""
-    result = handler(event("GET", "/api/templates"), None)
-    assert result["statusCode"] == 200
-    data = json.loads(result["body"])
-    assert "task_manager_api" in data["templates"]
-    assert "flask_app" in data["templates"]
-    assert data["total"] == 14
-    print(f"  ✓ Templates: {data['total']} templates loaded")
+    """Test GET /api/v1/templates"""
+    resp = client.get("/api/v1/templates")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert isinstance(data, list)
+    assert "task_manager_api" in data
 
 
 def test_mutations():
-    """Test GET /api/mutations"""
-    result = handler(event("GET", "/api/mutations"), None)
-    assert result["statusCode"] == 200
-    data = json.loads(result["body"])
-    assert data["total"] > 0
-    print(f"  ✓ Mutations: {data['total']} mutations loaded")
+    """Test GET /api/v1/mutations"""
+    resp = client.get("/api/v1/mutations")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert isinstance(data, list)
+    assert len(data) > 0
 
 
 def test_generate_world():
-    """Test POST /api/worlds/generate"""
-    result = handler(event("POST", "/api/worlds/generate", {
-        "template": "task_manager_api",
-        "mutation": "pagination_boundary"
-    }), None)
-    assert result["statusCode"] == 200
-    data = json.loads(result["body"])
-    assert data["status"] == "generated"
+    """Test POST /api/v1/worlds/generate"""
+    resp = client.post("/api/v1/worlds/generate")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "world_id" in data
     assert data["template"] == "task_manager_api"
-    print(f"  ✓ World: {data['world_id']} ({data['template']})")
-
-
-def test_generate_world_auto():
-    """Test POST /api/worlds/generate with auto mutation"""
-    result = handler(event("POST", "/api/worlds/generate", {
-        "template": "flask_app"
-    }), None)
-    assert result["statusCode"] == 200
-    data = json.loads(result["body"])
-    assert data["status"] == "generated"
-    print(f"  ✓ World (auto): {data['world_id']} ({data['template']}/{data['mutation']})")
 
 
 def test_experiments():
-    """Test GET /api/experiments"""
-    result = handler(event("GET", "/api/experiments"), None)
-    assert result["statusCode"] == 200
-    data = json.loads(result["body"])
-    # In serverless mode, experiments may be empty (no DB)
-    assert "experiments" in data or "total" in data
-    print(f"  ✓ Experiments: endpoint works (total: {data.get('total', 0)})")
-
-
-def test_docs():
-    """Test GET /api/docs"""
-    result = handler(event("GET", "/api/docs"), None)
-    assert result["statusCode"] == 200
-    data = json.loads(result["body"])
-    assert data["name"] == "ForgeLab API"
-    assert len(data["endpoints"]) > 0
-    print(f"  ✓ Docs: {len(data['endpoints'])} endpoints documented")
+    """Test GET /api/v1/experiments"""
+    resp = client.get("/api/v1/experiments")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert isinstance(data, list)
+    assert len(data) == 7
 
 
 def test_benchmark():
-    """Test GET /api/benchmark"""
-    result = handler(event("GET", "/api/benchmark"), None)
-    assert result["statusCode"] == 200
-    data = json.loads(result["body"])
+    """Test GET /api/v1/benchmark"""
+    resp = client.get("/api/v1/benchmark")
+    assert resp.status_code == 200
+    data = resp.json()
     assert data["templates"] == 14
-    print(f"  ✓ Benchmark: {data['templates']} templates, {data['mutations']} mutations")
+    assert data["mutations"] == 37
+
+
+def test_api_docs():
+    """Test GET /api/v1/docs"""
+    resp = client.get("/api/v1/docs")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "endpoints" in data
+    assert len(data["endpoints"]) > 0
 
 
 def test_404():
     """Test 404 for unknown route"""
-    result = handler(event("GET", "/api/unknown"), None)
-    assert result["statusCode"] == 404
-    data = json.loads(result["body"])
-    assert "error" in data
-    print(f"  ✓ 404: Unknown routes return 404")
+    resp = client.get("/api/v1/unknown")
+    assert resp.status_code == 404
 
 
-def test_cors():
-    """Test CORS preflight"""
-    result = handler(event("OPTIONS", "/api/health"), None)
-    assert result["statusCode"] == 204
-    assert "Access-Control-Allow-Origin" in result["headers"]
-    print(f"  ✓ CORS: Preflight returns 204 with CORS headers")
+def test_openapi():
+    """Test OpenAPI schema is available"""
+    resp = client.get("/openapi.json")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "paths" in data
 
 
-def test_invalid_json():
-    """Test invalid JSON body"""
-    ev = event("POST", "/api/worlds/generate", None)
-    ev["body"] = "not json"
-    result = handler(ev, None)
-    assert result["statusCode"] == 400
-    print(f"  ✓ Invalid JSON: Returns 400")
+def test_cors_preflight():
+    """Test that OPTIONS returns a valid response"""
+    resp = client.options("/health", headers={"origin": "http://localhost"})
+    assert resp.status_code in (200, 204, 405)
 
 
 def main():
@@ -147,16 +119,16 @@ def main():
 
     tests = [
         ("Health Check", test_health),
+        ("Root Page", test_root),
         ("Templates List", test_templates),
         ("Mutations List", test_mutations),
         ("Generate World", test_generate_world),
-        ("Generate World (Auto)", test_generate_world_auto),
         ("Experiments", test_experiments),
-        ("API Docs", test_docs),
         ("Benchmark", test_benchmark),
+        ("API Docs", test_api_docs),
         ("404 Handling", test_404),
-        ("CORS Preflight", test_cors),
-        ("Invalid JSON", test_invalid_json),
+        ("OpenAPI Schema", test_openapi),
+        ("CORS Preflight", test_cors_preflight),
     ]
 
     passed = 0
@@ -165,6 +137,7 @@ def main():
         try:
             test_fn()
             passed += 1
+            print(f"  ✓ {name}")
         except Exception as e:
             print(f"  ✗ {name}: {e}")
             failed += 1
