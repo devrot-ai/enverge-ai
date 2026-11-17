@@ -151,6 +151,31 @@ forgelab serve                         # Start the API server
 forgelab --help                        # See all commands
 ```
 
+## Deploy to Vercel
+
+ForgeLab runs on Vercel as serverless functions with a static landing page:
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+cd forgelab
+vercel
+```
+
+The landing page (`public/index.html`) shows project stats, features, and an interactive API tester. The API runs as Python serverless functions under `/api/*`.
+
+**What works on Vercel:**
+- Landing page with project overview and API testing
+- API endpoints: health check, docs, world/task generation, experiments, benchmark info
+- Stateless operations — each request is independent
+
+**What requires local setup:**
+- Streamlit dashboard (run locally with `streamlit run dashboard/app.py`)
+- Long-running agent executions (use CLI: `forgelab run --task-id X`)
+- Database persistence (Vercel uses ephemeral `/tmp` storage)
+
 ## Configuration
 
 Environment variables:

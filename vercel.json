@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "name": "forgelab",
+  "builds": [
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "public/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ],
+  "env": {
+    "FORGELAB_DATABASE_URL": "sqlite:///tmp/forgelab.db",
+    "FORGELAB_ENV": "vercel"
+  },
+  "functions": {
+    "api/**/*.py": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  }
+}
