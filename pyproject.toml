@@ -47,16 +47,10 @@ train = [
     "wandb>=0.16.0",
 ]
 
-[project.scripts]
-forgelab = "forge.cli:main"
-
 [project.urls]
 Homepage = "https://github.com/forgelab/forgelab"
 Documentation = "https://forgelab.readthedocs.io"
 Repository = "https://github.com/forgelab/forgelab"
-
-[tool.setuptools.packages.find]
-include = ["forge*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
