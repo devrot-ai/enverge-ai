@@ -275,29 +275,39 @@
         // Health check
         async function checkHealth() {
             try {
-                const data = await api('/api/health');
+                const data = await api('/health');
                 document.getElementById('status-dot').className = 'status-dot';
                 document.getElementById('status-text').textContent = `API Online — ${data.environment}`;
-                document.getElementById('stat-templates').textContent = data.templates;
-                document.getElementById('stat-mutations').textContent = data.mutations;
-                document.getElementById('stat-agents').textContent = data.agents;
-                document.getElementById('stat-tests').textContent = data.tests;
             } catch (e) {
                 document.getElementById('status-dot').className = 'status-dot offline';
                 document.getElementById('status-text').textContent = 'API Offline';
             }
         }
 
+        // Load benchmark stats
+        async function loadStats() {
+            try {
+                const data = await api('/api/v1/benchmark');
+                document.getElementById('stat-templates').textContent = data.templates || '-';
+                document.getElementById('stat-mutations').textContent = data.mutations || '-';
+                document.getElementById('stat-agents').textContent = data.agents || '-';
+                document.getElementById('stat-tests').textContent = data.tests || '-';
+            } catch (e) {}
+        }
+
         // Load templates
         async function loadTemplates() {
             try {
-                const data = await api('/api/templates');
+                const data = await api('/api/v1/templates');
+                const templates = data.templates || data;
                 const sel = document.getElementById('world-template');
-                sel.innerHTML = data.templates.map(t => `<option value="${t}">${t}</option>`).join('');
+                sel.innerHTML = templates.map(t => `<option value="${t}">${t}</option>`).join('');
                 document.getElementById('templates-list').innerHTML =
-                    data.templates.map(t => `<span class="tag">${t}</span>`).join('');
+                    templates.map(t => `<span class="tag">${t}</span>`).join('');
                 // Load mutations for selected template
-                loadMutations(data.templates[0]);
+                if (templates.length > 0) {
+                    loadMutations(templates[0]);
+                }
             } catch (e) {
                 document.getElementById('templates-list').innerHTML = '<span class="error">Failed to load</span>';
             }
@@ -306,10 +316,11 @@
         // Load mutations
         async function loadMutations(template) {
             try {
-                const data = await api('/api/mutations');
+                const data = await api('/api/v1/mutations');
+                const mutations = data.mutations || data;
                 const sel = document.getElementById('world-mutation');
                 sel.innerHTML = '<option value="">Auto-select</option>' +
-                    (data.mutations || []).map(m => `<option value="${m}">${m}</option>`).join('');
+                    mutations.map(m => `<option value="${m.mutation_id || m}">${m.mutation_id || m}</option>`).join('');
             } catch (e) {}
         }
 
@@ -325,7 +336,7 @@
             try {
                 const template = document.getElementById('world-template').value;
                 const mutation = document.getElementById('world-mutation').value || null;
-                const data = await api('/api/worlds/generate', 'POST', { template, mutation });
+                const data = await api('/api/v1/worlds/generate', 'POST', { template_name: template, mutation_id: mutation || null });
                 result.innerHTML = `<span class="success">✓ World generated!</span>\n${JSON.stringify(data, null, 2)}`;
             } catch (e) {
                 result.innerHTML = `<span class="error">✗ ${e.message}</span>`;
@@ -345,7 +356,7 @@
 
             try {
                 const worldId = document.getElementById('task-world-id').value;
-                const data = await api('/api/tasks/generate', 'POST', { world_id: worldId });
+                const data = await api('/api/v1/tasks/generate', 'POST', { world_id: worldId });
                 result.innerHTML = `<span class="success">✓ Task generated!</span>\n${JSON.stringify(data, null, 2)}`;
             } catch (e) {
                 result.innerHTML = `<span class="error">✗ ${e.message}</span>`;
@@ -357,11 +368,12 @@
         // Load experiments
         async function loadExperiments() {
             try {
-                const data = await api('/api/experiments');
+                const data = await api('/api/v1/experiments');
+                const experiments = data.experiments || data;
                 document.getElementById('experiments-list').innerHTML =
-                    data.experiments.map(e =>
+                    experiments.map(e =>
                         `<div style="margin:0.5rem 0;padding:0.5rem;background:#0a0a0a;border-radius:4px;">
-                            <strong style="color:#a0a0ff;">${e.name}</strong>
+                            <strong style="color:#a0a0ff;">${e.name || e.id}</strong>
                             <div style="color:#888;font-size:0.8rem;margin-top:0.3rem;">${e.description || ''}</div>
                         </div>`
                     ).join('') || '<span class="error">No experiments</span>';
@@ -373,10 +385,11 @@
         // Load API docs
         async function loadDocs() {
             try {
-                const data = await api('/api/docs');
+                const data = await api('/api/v1/docs');
+                const endpoints = data.endpoints || [];
                 document.getElementById('api-docs').innerHTML =
-                    data.endpoints.map(ep =>
-                        `<div style="font-family:monospace;font-size:0.85rem;padding:0.3rem 0;border-bottom:1px solid #222;">${ep}</div>`
+                    endpoints.map(ep =>
+                        `<div style="font-family:monospace;font-size:0.85rem;padding:0.3rem 0;border-bottom:1px solid #222;"><span style="color:#059669;">${ep.method}</span> ${ep.path} — <span style="color:#888;">${ep.description}</span></div>`
                     ).join('');
             } catch (e) {
                 document.getElementById('api-docs').innerHTML = '<span class="error">Failed to load</span>';
@@ -386,9 +399,9 @@
         // Load benchmark
         async function loadBenchmark() {
             try {
-                const data = await api('/api/benchmark');
+                const data = await api('/api/v1/benchmark');
                 document.getElementById('benchmark-info').innerHTML = `
-                    <div style="color:#888;font-size:0.9rem;">${data.message}</div>
+                    <div style="color:#888;font-size:0.9rem;">${data.description || 'ForgeLab benchmark suite'}</div>
                     <div style="margin-top:1rem;">
                         <span class="tag">${data.templates} templates</span>
                         <span class="tag">${data.mutations} mutations</span>
@@ -406,6 +419,7 @@
 
         // Init
         checkHealth();
+        loadStats();
         loadTemplates();
         loadExperiments();
         loadDocs();
