@@ -444,7 +444,9 @@ class TestExperimentConfig:
 class TestConfig:
     def test_default_config(self):
         config = Config()
-        assert config.get("database.url") == "sqlite:///./forgelab.db"
+        # Database URL may be overridden by FORGELAB_DATABASE_URL env var (e.g. Vercel)
+        db_url = config.get("database.url")
+        assert db_url.startswith("sqlite:///")
         assert config.get("sandbox.network_disabled") is True
 
     def test_config_get_with_default(self):
