@@ -206,6 +206,30 @@ def _register_builtin_agents() -> None:
     except ImportError:
         pass
 
+    # ClaudeAgent (optional, requires anthropic package)
+    try:
+        from forge.agents.claude import ClaudeAgent
+
+        register_agent(
+            "claude",
+            lambda config: ClaudeAgent(config),
+            ClaudeAgent,
+        )
+    except ImportError:
+        pass
+
+    # OpenSourceAgent (optional, requires openai package + Ollama/vLLM server)
+    try:
+        from forge.agents.ollama import OpenSourceAgent
+
+        register_agent(
+            "open_source",
+            lambda config: OpenSourceAgent(config),
+            OpenSourceAgent,
+        )
+    except ImportError:
+        pass
+
 
 # Register built-in agents on module load
 _register_builtin_agents()

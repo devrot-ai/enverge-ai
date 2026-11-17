@@ -4,6 +4,8 @@ Provides:
 - BaseAgent abstract interface
 - MockAgent for deterministic testing without API keys
 - OpenAICompatibleAgent for real LLM tool-calling
+- ClaudeAgent for Anthropic Claude API
+- OpenSourceAgent for Ollama/vLLM local models
 - Agent tools (list_files, read_file, write_file, etc.)
 - Agent registry and configuration
 """
@@ -24,10 +26,23 @@ from forge.agents.tools import (
     validate_tool_args,
 )
 
+# Optional imports — available when dependencies are installed
+try:
+    from forge.agents.claude import ClaudeAgent
+except ImportError:
+    ClaudeAgent = None  # type: ignore[misc,assignment]
+
+try:
+    from forge.agents.ollama import OpenSourceAgent
+except ImportError:
+    OpenSourceAgent = None  # type: ignore[misc,assignment]
+
 __all__ = [
     "BaseAgent",
     "MockAgent",
     "OpenAICompatibleAgent",
+    "ClaudeAgent",
+    "OpenSourceAgent",
     "ToolDefinition",
     "ToolExecutor",
     "get_all_tools",

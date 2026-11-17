@@ -5,6 +5,7 @@ Provides:
 - Bug mutations (pagination_boundary, empty_search, duplicate_records, etc.)
 - Difficulty estimation based on task characteristics
 - Task pool selection and management
+- LLMTaskGenerator for LLM-assisted task generation
 """
 
 __version__ = "0.1.0"
@@ -20,6 +21,16 @@ from forge.task_factory.mutations import (
 )
 from forge.task_factory.selection import TaskPool
 
+# Optional imports — available when openai is installed
+try:
+    from forge.task_factory.llm_generator import (
+        GeneratedTask,
+        LLMTaskGenerator,
+    )
+except ImportError:
+    GeneratedTask = None  # type: ignore[misc,assignment]
+    LLMTaskGenerator = None  # type: ignore[misc,assignment]
+
 __all__ = [
     "TaskGenerator",
     "BugMutation",
@@ -31,4 +42,6 @@ __all__ = [
     "adjust_task_difficulty",
     "get_difficulty_label",
     "TaskPool",
+    "GeneratedTask",
+    "LLMTaskGenerator",
 ]

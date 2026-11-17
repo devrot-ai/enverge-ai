@@ -1,10 +1,11 @@
-"""Sandbox module — Docker-based isolated execution.
+"""Sandbox module — isolated execution environments.
 
 Provides:
-- SandboxManager for container lifecycle management
+- SandboxManager for Docker container lifecycle management
 - SandboxExecutor for command execution inside containers
 - SandboxPolicy with security policies (non-root, no network, resource limits)
 - Workspace reset and cleanup
+- K8SSandboxManager for Kubernetes-based orchestration
 - Fail-closed security: no Docker means clear error, never fallback to host
 """
 
@@ -16,6 +17,18 @@ from forge.sandbox.policies import SandboxPolicy, get_default_policy, get_relaxe
 from forge.sandbox.reset import cleanup_workspace, create_fresh_workspace, reset_workspace
 from forge.sandbox.network import NetworkPolicyManager, NetworkPolicy, NetworkPolicyResult
 from forge.sandbox.image_validation import ImageValidator, ImageValidationResult
+
+# Optional imports — available when kubernetes is installed
+try:
+    from forge.sandbox.kubernetes import (
+        K8SConfig,
+        K8SSandbox,
+        K8SSandboxManager,
+    )
+except ImportError:
+    K8SConfig = None  # type: ignore[misc,assignment]
+    K8SSandbox = None  # type: ignore[misc,assignment]
+    K8SSandboxManager = None  # type: ignore[misc,assignment]
 
 __all__ = [
     "SandboxManager",
@@ -32,4 +45,7 @@ __all__ = [
     "NetworkPolicyResult",
     "ImageValidator",
     "ImageValidationResult",
+    "K8SConfig",
+    "K8SSandbox",
+    "K8SSandboxManager",
 ]

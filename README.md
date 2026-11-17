@@ -119,7 +119,7 @@ Lists all experiments — both preset (A-D, ablation studies, difficulty scaling
 
 **Environments:** 14 templates covering common patterns — APIs, data pipelines, web apps, ORMs, config systems, DSLs, browser automation, and more. 37 mutation types inject realistic bugs: null handling, SQL injection, CSRF, rate limiting, XSS, transaction leaks, and others.
 
-**Agents:** Four built-in agent types. `MockAgent` for testing without API keys. `RuleBasedAgent` with pre-built repair rules for all 37 mutation types. `ScriptAgent` for running your own Python scripts. `OpenAI-compatible` agent with tool calling (requires API key). Plus an adversarial wrapper for stress testing.
+**Agents:** Six built-in agent types. `MockAgent` for testing without API keys. `RuleBasedAgent` with pre-built repair rules for all 37 mutation types. `ScriptAgent` for running your own Python scripts. `OpenAI-compatible` agent with tool calling. `ClaudeAgent` for Anthropic's Claude API. `OpenSourceAgent` for local models via Ollama/vLLM. Plus an adversarial wrapper for stress testing. All agents degrade gracefully when their external service is unavailable.
 
 **Evaluation:** Independent test verification (public + hidden tests), static analysis (flake8/mypy), fuzzing-based edge case testing, performance regression detection, and code diff viewing.
 
@@ -132,6 +132,8 @@ Lists all experiments — both preset (A-D, ablation studies, difficulty scaling
 **Interfaces:** FastAPI backend (26 routes), Streamlit dashboard with filtering and charts, and a full Typer CLI.
 
 **Training Data:** Normalized trajectory export (JSONL), difficulty-weighted reward signals, positive/negative example curation, SFT and RL format export, and dataset versioning.
+
+**Training Integration:** Hugging Face TRL for SFT/DPO fine-tuning, GRPO for reinforcement learning, Microsoft Agent Lightning for distributed execution. All degrade gracefully when ML frameworks aren't installed.
 
 **Security:** Docker sandbox isolation, network policies, container image signing, and automated security audits.
 

@@ -1,4 +1,4 @@
-"""Training module — adapter interface for future RL integration.
+"""Training module — adapter interface for ML training integration.
 
 Provides:
 - TrainingAdapter interface for connecting to external trainers
@@ -7,7 +7,9 @@ Provides:
 - RewardComputer for computing reward signals
 - DatasetVersioner for versioned datasets
 - ExampleCurator for positive/negative example curation
-- Support for Hugging Face TRL, GRPO, PPO, Agent Lightning (future)
+- TRLTrainer for Hugging Face TRL integration
+- GRPOTrainer for Group Relative Policy Optimization
+- AgentLightningClient for Microsoft Agent Lightning
 """
 
 __version__ = "0.1.0"
@@ -23,6 +25,28 @@ from forge.training.normalized import (
 )
 from forge.training.rewards import RewardComputer, RewardSignal
 
+# Optional imports — available when ML dependencies are installed
+try:
+    from forge.training.trl_integration import TRLConfig, TRLTrainer
+except ImportError:
+    TRLConfig = None  # type: ignore[misc,assignment]
+    TRLTrainer = None  # type: ignore[misc,assignment]
+
+try:
+    from forge.training.grpo import GRPOConfig, GRPOTrainer
+except ImportError:
+    GRPOConfig = None  # type: ignore[misc,assignment]
+    GRPOTrainer = None  # type: ignore[misc,assignment]
+
+try:
+    from forge.training.agent_lightning import (
+        AgentLightningClient,
+        AgentLightningConfig,
+    )
+except ImportError:
+    AgentLightningClient = None  # type: ignore[misc,assignment]
+    AgentLightningConfig = None  # type: ignore[misc,assignment]
+
 __all__ = [
     "TrainingAdapter",
     "TrajectoryExporter",
@@ -37,4 +61,10 @@ __all__ = [
     "TrajectoryNormalizer",
     "RewardComputer",
     "RewardSignal",
+    "TRLConfig",
+    "TRLTrainer",
+    "GRPOConfig",
+    "GRPOTrainer",
+    "AgentLightningClient",
+    "AgentLightningConfig",
 ]
