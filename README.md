@@ -168,23 +168,22 @@ vercel --prod
 
 ### Vercel API Endpoints (Verified ✓)
 
-All 11 Vercel API tests pass locally. 71 core/integration tests pass with zero regressions.
+## Live Demo: https://workboxx.vercel.app/
 
-| Endpoint | Method | Description |
+All endpoints verified live on Vercel (deployed from this repo):
+
+| Endpoint | Status | Response |
 |---|---|---|
-| `/health` | GET | Health check with version and environment |
-| `/` | GET | Landing page with interactive dashboard |
-| `/api/v1/templates` | GET | List all 14 templates |
-| `/api/v1/mutations` | GET | List all 37 mutations |
-| `/api/v1/worlds/generate` | POST | Generate a broken repo from template |
-| `/api/v1/experiments` | GET | List 7 preset experiments |
-| `/api/v1/benchmark` | GET | Benchmark info (templates, mutations, agents) |
-| `/api/v1/docs` | GET | API documentation |
-| `/openapi.json` | GET | OpenAPI schema |
-| `/docs` | GET | Swagger UI docs |
-| Unknown routes | — | Returns 404 |
+| `/health` | ✅ 200 | `{"status":"ok","version":"0.9.0","environment":"vercel"}` |
+| `/` | ✅ 200 | Landing page with project info |
+| `/api/v1/templates` | ✅ 200 | 14 templates listed |
+| `/api/v1/mutations` | ✅ 200 | 37 mutations listed |
+| `/api/v1/worlds/generate` | ✅ 200 | Generates broken repos on demand |
+| `/api/v1/experiments` | ✅ 200 | 7 preset experiments |
+| `/api/v1/benchmark` | ✅ 200 | Benchmark stats |
+| `/api/v1/docs` | ✅ 200 | API documentation |
 
-Run `python -m pytest tests/test_vercel.py -v` to verify locally before deploying.
+Run `python -m pytest tests/test_vercel.py -v` to verify locally (11 tests).
 
 ### What's on Vercel
 
