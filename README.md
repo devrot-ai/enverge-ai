@@ -168,23 +168,23 @@ vercel --prod
 
 ### Vercel API Endpoints (Verified ✓)
 
-All 11 endpoints tested and passing:
+All 11 Vercel API tests pass locally. 71 core/integration tests pass with zero regressions.
 
-| Endpoint | Method | Status |
+| Endpoint | Method | Description |
 |---|---|---|
-| `/api/health` | GET | ✓ Returns system stats |
-| `/api/templates` | GET | ✓ Lists all 14 templates |
-| `/api/mutations` | GET | ✓ Lists all 37 mutations |
-| `/api/worlds/generate` | POST | ✓ Generates broken repos |
-| `/api/tasks/generate` | POST | ✓ Creates repair tasks |
-| `/api/experiments` | GET | ✓ Lists experiments |
-| `/api/benchmark` | GET | ✓ Benchmark info |
-| `/api/leaderboard` | GET | ✓ Leaderboard |
-| `/api/curriculum` | GET | ✓ Curriculum state |
-| `/api/docs` | GET | ✓ API documentation |
-| CORS / Error handling | OPTIONS | ✓ Preflight + 400/404 |
+| `/health` | GET | Health check with version and environment |
+| `/` | GET | Landing page with interactive dashboard |
+| `/api/v1/templates` | GET | List all 14 templates |
+| `/api/v1/mutations` | GET | List all 37 mutations |
+| `/api/v1/worlds/generate` | POST | Generate a broken repo from template |
+| `/api/v1/experiments` | GET | List 7 preset experiments |
+| `/api/v1/benchmark` | GET | Benchmark info (templates, mutations, agents) |
+| `/api/v1/docs` | GET | API documentation |
+| `/openapi.json` | GET | OpenAPI schema |
+| `/docs` | GET | Swagger UI docs |
+| Unknown routes | — | Returns 404 |
 
-Run `python tests/test_vercel.py` to verify locally before deploying.
+Run `python -m pytest tests/test_vercel.py -v` to verify locally before deploying.
 
 ### What's on Vercel
 
@@ -217,7 +217,7 @@ Environment variables:
 pytest tests/ -v
 ```
 
-612 tests covering all modules. The full suite runs in ~15 seconds.
+82+ tests covering Vercel API endpoints, core schemas, world generation, mutations, validation, agents, runner, evaluation, diagnosis, curriculum, experiments, sandbox, training adapter, Alembic migrations, seed task loader, and integration tests. The full suite runs in ~15 seconds.
 
 ## Limitations
 
