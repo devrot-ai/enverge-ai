@@ -3,10 +3,6 @@
   "name": "forgelab",
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index.py"
-    },
-    {
       "src": "/(.*)",
       "dest": "/public/$1"
     }
