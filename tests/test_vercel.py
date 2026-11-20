@@ -88,8 +88,9 @@ def test_experiments():
     resp = client.get("/api/v1/experiments")
     assert resp.status_code == 200
     data = resp.json()
-    assert isinstance(data, list)
-    assert len(data) == 7
+    assert "experiments" in data
+    assert isinstance(data["experiments"], list)
+    assert len(data["experiments"]) == 7
 
 
 def test_benchmark():

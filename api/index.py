@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, HTMLResponse
 from pydantic import BaseModel
 
@@ -24,6 +25,15 @@ app = FastAPI(
     title="ForgeLab",
     description="Adaptive environment factory for autonomous software engineering agents.",
     version="0.9.0",
+)
+
+# Allow the Next.js frontend to call the API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -199,15 +209,17 @@ async def generate_task(req: TaskGenerateRequest):
 @app.get("/api/v1/experiments")
 async def list_experiments():
     """List all preset experiments."""
-    return [
-        {"id": "A", "name": "Static vs Adaptive Curriculum", "description": "Compare static task selection vs adaptive curriculum."},
-        {"id": "B", "name": "Random vs Validated Environments", "description": "Compare randomly generated vs validated environments."},
-        {"id": "C", "name": "Generic vs Targeted Challenges", "description": "Compare generic tasks vs targeted skill-building tasks."},
-        {"id": "D", "name": "Single-agent vs Independent Verification", "description": "Compare single-agent verification vs independent test execution."},
-        {"id": "ablation_tools", "name": "Tool Ablation Study", "description": "Measure impact of removing tools one by one."},
-        {"id": "difficulty_scaling", "name": "Difficulty Scaling", "description": "Measure agent performance across difficulty levels."},
-        {"id": "cross_template", "name": "Cross-Template Generalization", "description": "Run same agent across all templates."},
-    ]
+    return {
+        "experiments": [
+            {"id": "A", "name": "Static vs Adaptive Curriculum", "description": "Compare static task selection vs adaptive curriculum."},
+            {"id": "B", "name": "Random vs Validated Environments", "description": "Compare randomly generated vs validated environments."},
+            {"id": "C", "name": "Generic vs Targeted Challenges", "description": "Compare generic tasks vs targeted skill-building tasks."},
+            {"id": "D", "name": "Single-agent vs Independent Verification", "description": "Compare single-agent verification vs independent test execution."},
+            {"id": "ablation_tools", "name": "Tool Ablation Study", "description": "Measure impact of removing tools one by one."},
+            {"id": "difficulty_scaling", "name": "Difficulty Scaling", "description": "Measure agent performance across difficulty levels."},
+            {"id": "cross_template", "name": "Cross-Template Generalization", "description": "Run same agent across all templates."},
+        ]
+    }
 
 
 @app.get("/api/v1/benchmark")
