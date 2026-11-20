@@ -31,10 +31,12 @@ def test_health():
 
 
 def test_root():
-    """Test GET / returns HTML"""
+    """Test GET / returns JSON info"""
     resp = client.get("/")
     assert resp.status_code == 200
-    assert "text/html" in resp.headers.get("content-type", "")
+    data = resp.json()
+    assert data["name"] == "ForgeLab"
+    assert data["version"] == "0.9.0"
 
 
 def test_templates():
