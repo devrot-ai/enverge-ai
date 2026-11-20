@@ -56,7 +56,7 @@ async def health():
     }
 
 
-@app.get("/", response_class=JSONResponse)
+@app.get("/api/v1/root", response_class=JSONResponse)
 async def root():
     """Root API endpoint."""
     return {
@@ -64,7 +64,7 @@ async def root():
         "version": "0.9.0",
         "description": "Adaptive environment factory for autonomous software engineering agents.",
         "docs": "/docs",
-        "health": "/health",
+        "health": "/api/health",
     }
 
 

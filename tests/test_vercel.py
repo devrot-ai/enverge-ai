@@ -31,8 +31,8 @@ def test_health():
 
 
 def test_root():
-    """Test GET / returns JSON info"""
-    resp = client.get("/")
+    """Test GET /api/v1/root returns JSON info"""
+    resp = client.get("/api/v1/root")
     assert resp.status_code == 200
     data = resp.json()
     assert data["name"] == "ForgeLab"
