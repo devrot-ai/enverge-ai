@@ -76,6 +76,19 @@ async def root():
     )
 
 
+
+@app.get("/api/v1/root")
+async def root_info():
+    """Root API info endpoint."""
+    return {
+        "name": "ForgeLab",
+        "version": "0.9.0",
+        "description": "Adaptive environment factory for autonomous software engineering agents.",
+        "docs": "/docs",
+        "health": "/api/health",
+    }
+
+
 @app.get("/api/v1/templates")
 async def list_templates_endpoint():
     """List all available environment templates."""
