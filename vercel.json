@@ -1,15 +1,6 @@
 {
   "version": 2,
   "name": "forgelab",
-  "builds": [
-    { "src": "package.json", "use": "@vercel/next" },
-    { "src": "api/index.py", "use": "@vercel/python" }
-  ],
-  "routes": [
-    { "src": "/health", "dest": "/api/index.py" },
-    { "src": "/api/v1/(.*)", "dest": "/api/index.py" },
-    { "src": "/(.*)", "dest": "/$1" }
-  ],
   "env": {
     "FORGELAB_DATABASE_URL": "sqlite:///tmp/forgelab.db",
     "FORGELAB_ENV": "vercel"

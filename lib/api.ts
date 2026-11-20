@@ -47,7 +47,7 @@ export async function getDocs() {
 }
 
 export async function checkHealth() {
-  const res = await fetch('/health');
+  const res = await fetch('/api/health');
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return res.json();
 }

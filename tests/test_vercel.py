@@ -22,8 +22,8 @@ client = TestClient(app)
 
 
 def test_health():
-    """Test GET /health"""
-    resp = client.get("/health")
+    """Test GET /api/health returns status"""
+    resp = client.get("/api/health")
     assert resp.status_code == 200
     data = resp.json()
     assert data["status"] == "ok"
@@ -127,7 +127,7 @@ def test_openapi():
 
 def test_cors_preflight():
     """Test that OPTIONS returns a valid response"""
-    resp = client.options("/health", headers={"origin": "http://localhost"})
+    resp = client.options("/api/health", headers={"origin": "http://localhost"})
     assert resp.status_code in (200, 204, 405)
 
 

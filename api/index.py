@@ -46,7 +46,7 @@ class TaskGenerateRequest(BaseModel):
     world_id: str
 
 
-@app.get("/health")
+@app.get("/api/health")
 async def health():
     """Health check endpoint."""
     return {
