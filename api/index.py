@@ -56,16 +56,24 @@ async def health():
     }
 
 
-@app.get("/api/v1/root", response_class=JSONResponse)
+@app.get("/", response_class=HTMLResponse)
 async def root():
-    """Root API endpoint."""
-    return {
-        "name": "ForgeLab",
-        "version": "0.9.0",
-        "description": "Adaptive environment factory for autonomous software engineering agents.",
-        "docs": "/docs",
-        "health": "/api/health",
-    }
+    """Serve the landing page."""
+    public_index = Path(__file__).parent.parent / "public" / "index.html"
+    if public_index.exists():
+        try:
+            content = public_index.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            content = public_index.read_text(encoding="latin-1")
+        return HTMLResponse(content=content)
+    return HTMLResponse(
+        content="""
+        <html><head><title>ForgeLab</title></head>
+        <body><h1>ForgeLab</h1>
+        <p>API is running. Visit <a href="/api/health">/api/health</a>.</p>
+        </body></html>
+        """
+    )
 
 
 @app.get("/api/v1/templates")

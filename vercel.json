@@ -7,9 +7,7 @@
     }
   },
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/index.py" },
-    { "src": "/", "dest": "/public/index.html" },
-    { "src": "/(.*)", "headers": { "cache-control": "s-maxage=31536000, immutable" }, "dest": "/public/$1" }
+    { "src": "/(.*)", "dest": "/api/index.py" }
   ],
   "env": {
     "FORGELAB_DATABASE_URL": "sqlite:///tmp/forgelab.db",
