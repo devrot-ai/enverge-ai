@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from 'react';
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -17,7 +18,11 @@ export const metadata: Metadata = {
   description: "Generate broken code, run AI agents, verify fixes, and adapt curriculum. 14 templates, 37 mutations, 6 agent types.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html
       lang="en"

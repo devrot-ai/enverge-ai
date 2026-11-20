@@ -56,3 +56,10 @@ Desktop.ini
 runs/
 worlds/
 artifacts/
+
+# Node.js / Next.js
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
