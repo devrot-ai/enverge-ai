@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ForgeLab — Adaptive Environment Factory for AI Coding Agents</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a0a;color:#e5e5e5;line-height:1.6}
+    .container{max-width:1100px;margin:0 auto;padding:0 24px}
+    header{border-bottom:1px solid #262626;padding:24px 0}
+    header .container{display:flex;justify-content:space-between;align-items:center}
+    h1{font-size:1.5rem;font-weight:700}
+    .subtitle{color:#737373;font-size:.875rem}
+    .github-btn{padding:8px 16px;border:1px solid #404040;border-radius:8px;color:#e5e5e5;text-decoration:none;font-size:.875rem;transition:background .2s}
+    .github-btn:hover{background:#262626}
+    .hero{text-align:center;padding:64px 0 48px}
+    .hero h2{font-size:2.5rem;font-weight:800;letter-spacing:-.025em}
+    .hero p{color:#a3a3a3;font-size:1.125rem;max-width:600px;margin:16px auto 0}
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;padding:32px 0}
+    .stat-card{background:#171717;border:1px solid #262626;border-radius:12px;padding:24px;text-align:center}
+    .stat-value{font-size:2rem;font-weight:700}
+    .stat-label{color:#737373;font-size:.875rem;margin-top:4px}
+    .stat-online{display:flex;align-items:center;justify-content:center;gap:8px}
+    .dot{width:10px;height:10px;border-radius:50%}
+    .dot-green{background:#22c55e}
+    .dot-red{background:#ef4444}
+    .section{padding:32px 0}
+    .section h3{font-size:1.25rem;font-weight:600;margin-bottom:16px}
+    .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
+    .card{background:#171717;border:1px solid #262626;border-radius:12px;padding:24px}
+    .badge{display:inline-block;padding:4px 10px;border-radius:9999px;background:#262626;font-size:.75rem;margin:3px}
+    .experiment{padding:12px 0;border-bottom:1px solid #262626}
+    .experiment:last-child{border-bottom:none}
+    .experiment h4{font-size:.95rem;font-weight:600}
+    .experiment p{color:#737373;font-size:.85rem;margin-top:4px}
+    .form-group{margin-bottom:16px}
+    label{display:block;font-size:.875rem;font-weight:500;margin-bottom:6px}
+    select,input{width:100%;padding:10px 12px;background:#262626;border:1px solid #404040;border-radius:8px;color:#e5e5e5;font-size:.875rem}
+    button{padding:10px 24px;background:#e5e5e5;color:#0a0a0a;border:none;border-radius:8px;font-weight:600;cursor:pointer;transition:background .2s}
+    button:hover{background:#a3a3a3}
+    button:disabled{opacity:.5;cursor:not-allowed}
+    .result{margin-top:16px;padding:16px;background:#262626;border-radius:8px;font-size:.85rem;white-space:pre-wrap;word-break:break-all}
+    .endpoint{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #262626;font-size:.875rem}
+    .method{padding:2px 8px;border-radius:4px;font-weight:600;font-size:.75rem;min-width:50px;text-align:center}
+    .method-get{background:#1e3a5f;color:#60a5fa}
+    .method-post{background:#1a3a2a;color:#4ade80}
+    .path{color:#a3a3a3}
+    .desc{color:#737373;margin-left:auto}
+    .skeleton{background:#262626;border-radius:8px;height:24px;animation:pulse 1.5s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    footer{border-top:1px solid #262626;padding:24px 0;text-align:center;color:#737373;font-size:.85rem}
+    footer a{color:#a3a3a3}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div>
+        <h1>ForgeLab</h1>
+        <p class="subtitle">Adaptive Environment Factory for AI Coding Agents</p>
+      </div>
+      <a class="github-btn" href="https://github.com/devrot-ai/enverge-ai" target="_blank">GitHub</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <section class="hero">
+      <h2>Test AI Agents Against Broken Code</h2>
+      <p>ForgeLab generates realistic broken code repositories, runs AI agents against them, independently verifies fixes, and adapts the curriculum based on results.</p>
+    </section>
+
+    <div class="stats" id="stats">
+      <div class="stat-card"><div class="skeleton"></div></div>
+      <div class="stat-card"><div class="skeleton"></div></div>
+      <div class="stat-card"><div class="skeleton"></div></div>
+      <div class="stat-card"><div class="skeleton"></div></div>
+      <div class="stat-card"><div class="skeleton"></div></div>
+    </div>
+
+    <div class="grid-2 section">
+      <div class="card">
+        <h3>Templates</h3>
+        <div id="templates"><div class="skeleton" style="height:40px"></div></div>
+      </div>
+      <div class="card">
+        <h3>Experiments</h3>
+        <div id="experiments"><div class="skeleton" style="height:80px"></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="card">
+        <h3>Generate Broken Repo</h3>
+        <div class="grid-2">
+          <div>
+            <div class="form-group">
+              <label>Template</label>
+              <select id="template-select"><option>Loading...</option></select>
+            </div>
+          </div>
+          <div>
+            <div class="form-group">
+              <label>Mutation</label>
+              <select id="mutation-select"><option>Loading...</option></select>
+            </div>
+          </div>
+        </div>
+        <button id="generate-btn" onclick="generateWorld()">Generate World</button>
+        <div id="generate-result" class="result" style="display:none"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="card">
+        <h3>API Endpoints</h3>
+        <div id="endpoints"></div>
+      </div>
+    </div>
+
+    <footer>
+      <p>Built with FastAPI &amp; Python &bull; <a href="https://github.com/devrot-ai/enverge-ai">Source Code</a></p>
+    </footer>
+  </div>
+
+  <script>
+    const API = '';
+
+    async function load() {
+      // Health + Benchmark
+      try {
+        const [h, b] = await Promise.allSettled([
+          fetch(API + '/api/health').then(r => r.json()),
+          fetch(API + '/api/v1/benchmark').then(r => r.json())
+        ]);
+        const health = h.status === 'fulfilled' ? h.value : null;
+        const bench = b.status === 'fulfilled' ? b.value : {};
+        document.getElementById('stats').innerHTML = `
+          <div class="stat-card"><div class="stat-value">${bench.templates||'-'}</div><div class="stat-label">Templates</div></div>
+          <div class="stat-card"><div class="stat-value">${bench.mutations||'-'}</div><div class="stat-label">Mutations</div></div>
+          <div class="stat-card"><div class="stat-value">${bench.agents||'-'}</div><div class="stat-label">Agents</div></div>
+          <div class="stat-card"><div class="stat-value">${bench.tests||'-'}</div><div class="stat-label">Tests</div></div>
+          <div class="stat-card"><div class="stat-online"><div class="dot ${health?.status==='ok'?'dot-green':'dot-red'}"></div><span>${health?.status==='ok'?'API Online':'API Offline'}</span></div></div>
+        `;
+      } catch(e) {
+        console.error('Stats load failed', e);
+      }
+
+      // Templates
+      try {
+        const t = await fetch(API + '/api/v1/templates').then(r => r.json());
+        const templates = t.templates || [];
+        document.getElementById('templates').innerHTML = templates.map(x => `<span class="badge">${x}</span>`).join('');
+        const sel = document.getElementById('template-select');
+        sel.innerHTML = templates.map(x => `<option value="${x}">${x}</option>`).join('');
+        sel.onchange = loadMutations;
+      } catch(e) { console.error('Templates load failed', e); }
+
+      // Mutations
+      loadMutations();
+
+      // Experiments
+      try {
+        const e = await fetch(API + '/api/v1/experiments').then(r => r.json());
+        const experiments = e.experiments || [];
+        document.getElementById('experiments').innerHTML = experiments.map(x =>
+          `<div class="experiment"><h4>${x.id}: ${x.name}</h4><p>${x.description}</p></div>`
+        ).join('');
+      } catch(e) { console.error('Experiments load failed', e); }
+
+      // Endpoints
+      try {
+        const d = await fetch(API + '/api/v1/docs').then(r => r.json());
+        const endpoints = d.endpoints || [];
+        document.getElementById('endpoints').innerHTML = endpoints.map(x =>
+          `<div class="endpoint"><span class="method ${x.method==='GET'?'method-get':'method-post'}">${x.method}</span><span class="path">${x.path}</span><span class="desc">${x.description}</span></div>`
+        ).join('');
+      } catch(e) { console.error('Docs load failed', e); }
+    }
+
+    async function loadMutations() {
+      try {
+        const m = await fetch(API + '/api/v1/mutations').then(r => r.json());
+        const mutations = m.mutations || [];
+        document.getElementById('mutation-select').innerHTML = mutations.map(x =>
+          `<option value="${x.mutation_id}">${x.mutation_id} — ${x.name}</option>`
+        ).join('');
+      } catch(e) { console.error('Mutations load failed', e); }
+    }
+
+    async function generateWorld() {
+      const template = document.getElementById('template-select').value;
+      const mutation = document.getElementById('mutation-select').value;
+      const btn = document.getElementById('generate-btn');
+      const result = document.getElementById('generate-result');
+      btn.disabled = true;
+      btn.textContent = 'Generating...';
+      try {
+        const r = await fetch(API + '/api/v1/worlds/generate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({template_name: template, mutation_id: mutation})
+        });
+        const data = await r.json();
+        result.style.display = 'block';
+        result.textContent = JSON.stringify(data, null, 2);
+      } catch(e) {
+        result.style.display = 'block';
+        result.textContent = 'Error: ' + e.message;
+      }
+      btn.disabled = false;
+      btn.textContent = 'Generate World';
+    }
+
+    load();
+  </script>
+</body>
+</html>
